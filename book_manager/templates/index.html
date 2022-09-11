@@ -1,6 +1,68 @@
-<h1>hello shireen</h1>
+<!-- <h1>hello shireen</h1>
 {% block body %}
     {% for user in newuser %}
         <h4>{{user}}</h4>
     {% endfor %}
-{% endblock %}
+{% endblock %} -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Book Management</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+
+/* Style the header */
+.header {
+  margin-top: 50px;
+  padding: 120px;
+  text-align: center;
+  background: #c76e26;
+  color: white;
+}
+
+/* Increase the font size of the h1 element */
+.header h1 {
+  font-size: 40px;
+}
+
+.button {
+  background-color: #534b3c; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  -webkit-transition-duration: 0.4s; 
+  transition-duration: 0.4s;
+  border-radius: 8px;
+}
+
+.button2:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Book Management App</h1>
+  <p>created by shireen srivastava</p>
+</div>
+<br>
+<center>
+    <button onclick="location.href='http://127.0.0.1:5000/login'" type="button" class = "button button2">LOGIN</button>
+    <button onclick="location.href='http://127.0.0.1:5000/registration'" type="button" class = "button button2">SIGN UP</button>
+</center>
+</body>
+</html>

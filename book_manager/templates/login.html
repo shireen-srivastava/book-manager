@@ -46,23 +46,21 @@ hr {
 </style>  
 </head>  
 <body>  
-<form action="/registration" method="POST">  
-  <div class="container">  
-  <center>  <h1> Sign Up </h1> </center>  
-  <hr>  
-  <label> Name </label>   
-<input type="text" name="name" placeholder= "Enter Name" size="15" autocomplete="off" required />   
+<form action="/login" method="POST">  
+<div class="container">  
+  <center>  <h1> Login </h1> </center>  
+  <hr>     
 <label> Email </label>   
 <input type="text" name="email" placeholder="Enter Email" size="15" autocomplete="off" required />   
 <label> Password </label>    
 <input type="text" name="password" placeholder="Enter Password" size="15" autocomplete="off" required />   
-
-<button type="submit" class="registerbtn">SIGN UP</button>
+<button type="submit" class="registerbtn">LOGIN</button> 
 <button class="registerbtn" onclick="location.href='http://127.0.0.1:5000/homepage'" type="button">Back</button>
 
 <br>
 <br>
-Already registered, <a href="http://127.0.0.1:5000/login">Login</a>
+New User, Create Account <a href="http://127.0.0.1:5000/registration">SignUp</a>
+</div>
 </form>  
 </body>  
 </html>  
