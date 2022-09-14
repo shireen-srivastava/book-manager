@@ -23,6 +23,11 @@ input[type=text], input[type=password], textarea {
 input[type=text]:focus, input[type=password]:focus {  
   outline: none;  
 }  
+
+h4 {
+ color: red;
+}
+
  div {  
             padding: 10px 0;  
          }  
@@ -48,12 +53,25 @@ hr {
 <body>  
 <form action="/login" method="POST">  
 <div class="container">  
+  <h4>{% with messages = get_flashed_messages() %}  
+    {% if messages %}  
+          {% for message in messages %}  
+               <p>{{ message }}</p>  
+          {% endfor %}  
+    {% endif %}  
+ {% endwith %} </h4>
+
   <center>  <h1> Login </h1> </center>  
   <hr>     
 <label> Email </label>   
-<input type="text" name="email" placeholder="Enter Email" size="15" autocomplete="off" required />   
+<input type="text" name="email" placeholder="Enter Email" size="15" required />   
 <label> Password </label>    
-<input type="text" name="password" placeholder="Enter Password" size="15" autocomplete="off" required />   
+
+<input type="password" name="password" id="myInput" placeholder="Enter Password" size="15" autocomplete="off" required />   
+<input type="checkbox" onclick="myFunction()">Show Password
+<br>
+<br>
+
 <button type="submit" class="registerbtn">LOGIN</button> 
 <button class="registerbtn" onclick="location.href='http://127.0.0.1:5000/homepage'" type="button">Back</button>
 
@@ -62,5 +80,15 @@ hr {
 New User, Create Account <a href="http://127.0.0.1:5000/registration">SignUp</a>
 </div>
 </form>  
+<script>
+  function myFunction() {
+    var x = document.getElementById("myInput");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
+  </script>
 </body>  
 </html>  

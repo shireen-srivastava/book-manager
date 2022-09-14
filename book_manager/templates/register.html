@@ -54,15 +54,27 @@ hr {
 <input type="text" name="name" placeholder= "Enter Name" size="15" autocomplete="off" required />   
 <label> Email </label>   
 <input type="text" name="email" placeholder="Enter Email" size="15" autocomplete="off" required />   
-<label> Password </label>    
-<input type="text" name="password" placeholder="Enter Password" size="15" autocomplete="off" required />   
-
+<label> Password </label> 
+<input type="password" name="password" id="myInput" placeholder="Enter Password" size="15" autocomplete="off" required />   
+<input type="checkbox" onclick="myFunction()">Show Password
+<br>
+<br>
 <button type="submit" class="registerbtn">SIGN UP</button>
 <button class="registerbtn" onclick="location.href='http://127.0.0.1:5000/homepage'" type="button">Back</button>
 
 <br>
 <br>
 Already registered, <a href="http://127.0.0.1:5000/login">Login</a>
-</form>  
+</form> 
+<script>
+  function myFunction() {
+    var x = document.getElementById("myInput");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
+  </script> 
 </body>  
 </html>  

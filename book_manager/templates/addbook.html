@@ -7,6 +7,9 @@ body{
   font-family: Calibri, Helvetica, sans-serif;  
   background-color: #c76e26;  
 }  
+h4 {
+  color : green;
+}
 .container {  
     padding: 50px;  
   background-color: rgb(222, 209, 191);  
@@ -46,6 +49,13 @@ hr {
 </style>  
 </head>  
 <body> 
+  <h4>{% with messages = get_flashed_messages() %}  
+    {% if messages %}  
+          {% for message in messages %}  
+               <p>{{ message }}</p>  
+          {% endfor %}  
+    {% endif %}  
+  {% endwith %}</h4>
 <form action="/addbook" method="POST">  
   <div class="container">  
   <center>  <h1> Add your book </h1> </center> 
