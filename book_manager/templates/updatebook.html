@@ -1,0 +1,83 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<style>  
+body{  
+  font-family: Calibri, Helvetica, sans-serif;  
+  background-color: #c76e26;  
+}  
+h4 {
+  color : green;
+}
+.container {  
+    padding: 50px;  
+  background-color: rgb(222, 209, 191);  
+}  
+  
+input[type=text], input[type=password], textarea {  
+  width: 100%;  
+  padding: 15px;  
+  margin: 5px 0 22px 0;  
+  display: inline-block;  
+  border: none;  
+  background: #f1f1f1;  
+}  
+input[type=text]:focus, input[type=password]:focus {  
+  outline: none;  
+}  
+ div {  
+            padding: 10px 0;  
+         }  
+hr {  
+  border: 1px solid #f1f1f1;  
+  margin-bottom: 25px;  
+}  
+.registerbtn {  
+  background-color: #534b3c;  
+  color: white;  
+  padding: 14px 20px;  
+  margin: 8px 0;  
+  border: none;  
+  cursor: pointer;  
+  width: 49%;  
+  opacity: 0.9;  
+}  
+.registerbtn:hover {  
+  opacity: 1;  
+}  
+</style>  
+</head>  
+<body> 
+  <h4>{% with messages = get_flashed_messages() %}  
+    {% if messages %}  
+          {% for message in messages %}  
+               <p>{{ message }}</p>  
+          {% endfor %}  
+    {% endif %}  
+  {% endwith %}</h4>
+  {% block body %}
+  {% for book in book %}
+  {% set id = book["_id"] %}
+  
+    <form action="{{ url_for('update_book',bookid=id)}}" method="POST">  
+        <div class="container">  
+        <center>  <h1> Update your book </h1> </center> 
+        <hr> 
+<label> Name </label>   
+<input type="text" name="name" placeholder= "Enter Name" value = "{{ book["name"] }}" size="15" autocomplete="off" required />   
+<label> Author </label>   
+<input type="text" name="author" placeholder="Enter Author" value = "{{ book["author"] }}" size="15" autocomplete="off" required />   
+<label> Description </label>    
+<input type="text" name="description" placeholder="Enter Description" value = "{{ book["description"] }}" size="15" autocomplete="off" required />   
+<label> Price </label>    
+<input type="text" name="price" placeholder="Enter Price" value = "{{ book["price"] }}" size="15" autocomplete="off" required />   
+
+<button type="submit" class="registerbtn"> Update </button>
+</form>  
+<button class="registerbtn" onclick="location.href='http://127.0.0.1:5000/books'" type="button">Back</button>
+    {% endfor %}
+{% endblock %}
+
+</body>  
+</html>  

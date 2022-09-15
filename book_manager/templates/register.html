@@ -11,7 +11,11 @@ body{
     padding: 50px;  
   background-color: rgb(222, 209, 191);  
 }  
-  
+
+h4 {
+  color : red;
+}
+
 input[type=text], input[type=password], textarea {  
   width: 100%;  
   padding: 15px;  
@@ -48,6 +52,13 @@ hr {
 <body>  
 <form action="/registration" method="POST">  
   <div class="container">  
+    <h4>{% with messages = get_flashed_messages() %}  
+      {% if messages %}  
+            {% for message in messages %}  
+                 <p>{{ message }}</p>  
+            {% endfor %}  
+      {% endif %}  
+    {% endwith %}</h4>
   <center>  <h1> Sign Up </h1> </center>  
   <hr>  
   <label> Name </label>   

@@ -100,23 +100,60 @@ body {
   display: block;
 }
 
-  </style>
-  </head>
-  <body>
-     <div class="navbar">
-      <a href="http://127.0.0.1:5000/homepage">Home</a>
-      <a href="http://127.0.0.1:5000/addbook">Add Book</a>
-      <div class="dropdown" style="float:right; padding-right: 40px;">
-        <button class="dropbtn"> 
-          <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size:25px"></i>
-        </button>
-        <div class="dropdown-content">
-          <a href="{{url_for('getprofile')}}">Profile</a>
-          <a href="http://127.0.0.1:5000/logout">Logout</a>
-        </div>
-      </div> 
+.button {
+  background-color: #534b3c; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  -webkit-transition-duration: 0.4s; 
+  transition-duration: 0.4s;
+  border-radius: 8px;
+}
+
+.button2:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #04AA6D;
+}
+
+</style>
+</head>
+<body>
+   <div class="navbar">
+    <a href="http://127.0.0.1:5000/homepage">Home</a>
+    <a href="http://127.0.0.1:5000/addbook">Add Book</a>
+    <div class="dropdown" style="float:right; padding-right: 40px;">
+      <button class="dropbtn"> 
+        <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size:25px"></i>
+      </button>
+      <div class="dropdown-content">
+        <a href="{{url_for('getprofile')}}">Profile</a>
+        <a href="http://127.0.0.1:5000/logout">Logout</a>
+      </div>
     </div> 
-<br>
+  </div> <br><br><Br>
+
 <h4>{% with messages = get_flashed_messages() %}  
   {% if messages %}  
         {% for message in messages %}  
@@ -124,40 +161,23 @@ body {
         {% endfor %}  
   {% endif %}  
 {% endwith %}</h4>
-<br>
-<center><h1>My Books</h1></center>
-<br><br>
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Author</th>
-    <th>Description</th>
-    <th>Price</th>
-  </tr>
+
   {% block body %}
-    {% for book in newbook %}
-    {% set nevar = book["_id"] %}
-    {% set nevar2 = book["userid"] %}
-    <tr data-href = "{{url_for('getbook', bookid = nevar)}}">
-        <td>{{book["name"]}}</td>
-        <td>{{book["author"]}}</td>
-        <td>{{book["description"]}}</td>
-        <td>{{book["price"]}}</td>
-    </tr>
+    {% for user in user %}
+  
+    <center>
+    <h2>{{user["name"] | upper}}</h2>
+    <br>Email Id : {{user["email"]}}
+    </center>
+
+    <br><br>
+        <center>
+            <a href = "http://127.0.0.1:5000/books" class = "button button2">BACK</a>
+        </center>
+       
     {% endfor %}
   {% endblock %}
-</table>
 
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-  const rows = document.querySelectorAll("tr[data-href]");
-  rows.forEach(row => {
-    row.addEventListener("click", () => {
-      window.location.href = row.dataset.href;
-    })
-  })
-})
-</script>
-</body>
+    </body>
 </html>
+
