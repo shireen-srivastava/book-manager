@@ -90,6 +90,20 @@ def getbooks():
         return redirect("/login")
 
 
+@app.route("/readbooks", methods = ["GET"])
+def getreadbooks():
+    if session["email"]:
+        print(session['email'])
+        new_book = []
+        data = db1.find({"userid": userid, "read":"true"})
+        for i in data:
+            new_book.append(i)
+        print(new_book)
+        return render_template("readbooks.html", newbook = new_book)
+    else:
+        return redirect("/login")
+
+
 @app.route("/users", methods = ["GET"])
 def getprofile():
     user = []
@@ -106,13 +120,15 @@ def createBooks():
             author = request.form['author']
             description = request.form['description']
             price = request.form['price']
+            read = request.form['read']
 
             id = db1.insert_one({
                 'userid': userid,
                 'name': name,
                 'author' : author,
                 'description' : description,
-                'price' : price
+                'price' : price,
+                'read' : read
             })
             flash(f"Book added successfully",'success')
             return redirect("/books")
@@ -141,6 +157,7 @@ def delete_book(bookid):
     else:
         return redirect("/login")
 
+
 @app.route('/updatebooks/<bookid>', methods=["GET", "POST"])
 def update_book(bookid):
     if session["email"]:
@@ -154,7 +171,8 @@ def update_book(bookid):
             author = request.form['author']
             description = request.form['description']
             price = request.form['price']
-            db1.update_one({"_id":ObjectId(bookid)}, {'$set' : {"name":name, "author":author, "description":description, "price":price}})
+            read = request.form['read']
+            db1.update_one({"_id":ObjectId(bookid)}, {'$set' : {"name":name, "author":author, "description":description, "price":price, "read":read}})
                 
             flash(f"Book updated successfully!!",'success')
             return redirect("/books")
