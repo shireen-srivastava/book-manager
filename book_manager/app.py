@@ -5,6 +5,14 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from flask_session import Session
 import re
+import os
+import pathlib
+import requests
+from flask import Flask, session, abort, redirect, request
+# from google.oauth2 import id_token
+# from google_auth_oauthlib.flow import Flow
+# from pip._vendor import cachecontrol
+# import google.auth.transport.requests
 
 
 app = Flask(__name__)
@@ -14,9 +22,30 @@ app.config['SECRET_KEY'] = '234567iujhgvfcdsertyui98765427uywh'
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
+
+
 bcrypt = Bcrypt(app)
 sessionv = Session(app)
 mongo = PyMongo(app)
+
+
+
+
+# os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  #this is to set our environment to https because OAuth 2.0 only supports https environments
+
+# GOOGLE_CLIENT_ID = "639636231734-ak3qf1vi88tk0erbs5fukimvhfkssm5s.apps.googleusercontent.com"  #enter your client id you got from Google console
+# client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret_639636231734-ak3qf1vi88tk0erbs5fukimvhfkssm5s.apps.googleusercontent.com.json")  #set the path to where the .json file you got Google console is
+
+# print(os.path)
+# print(pathlib.Path)
+# flow = Flow.from_client_secrets_file(  #Flow is OAuth 2.0 a class that stores all the information on how we want to authorize our users
+#     client_secrets_file=client_secrets_file,
+#     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],  #here we are specifing what do we get after the authorization
+#     redirect_uri="http://127.0.0.1:5000/callback"  #and the redirect URI is the point where the user will end up after the authorization
+# )
+
+
+
 
 db = mongo.db.users
 db1 = mongo.db.books
@@ -79,12 +108,10 @@ def getuser():
 @app.route("/books", methods = ["GET"])
 def getbooks():
     if session["email"]:
-        print(session['email'])
         new_book = []
         data = db1.find({"userid": userid})
         for i in data:
             new_book.append(i)
-        print(new_book)
         return render_template("book.html", newbook = new_book)
     else:
         return redirect("/login")
@@ -95,10 +122,9 @@ def getreadbooks():
     if session["email"]:
         print(session['email'])
         new_book = []
-        data = db1.find({"userid": userid, "read":"true"})
+        data = db1.find({"userid": userid, "read":True})
         for i in data:
             new_book.append(i)
-        print(new_book)
         return render_template("readbooks.html", newbook = new_book)
     else:
         return redirect("/login")
@@ -118,17 +144,16 @@ def createBooks():
         if request.method == "POST":
             name = request.form['name']
             author = request.form['author']
-            description = request.form['description']
+            genres = request.form['genres']
             price = request.form['price']
-            read = request.form['read']
 
             id = db1.insert_one({
                 'userid': userid,
                 'name': name,
                 'author' : author,
-                'description' : description,
+                'genres' : genres,
                 'price' : price,
-                'read' : read
+                'read' : False
             })
             flash(f"Book added successfully",'success')
             return redirect("/books")
@@ -169,16 +194,43 @@ def update_book(bookid):
         if request.method == "POST":
             name = request.form['name']
             author = request.form['author']
-            description = request.form['description']
+            genres = request.form['genres']
             price = request.form['price']
-            read = request.form['read']
-            db1.update_one({"_id":ObjectId(bookid)}, {'$set' : {"name":name, "author":author, "description":description, "price":price, "read":read}})
+            if request.form['read'] == "true":
+                read = True
+            else:
+                read = False
+            db1.update_one({"_id":ObjectId(bookid)}, {'$set' : {"name":name, "author":author, "genres":genres, "price":price, "read":read}})
                 
             flash(f"Book updated successfully!!",'success')
             return redirect("/books")
         return render_template("updatebook.html", book = book)
     else:
         return redirect("/login")
+
+
+@app.route("/forgotpassword", methods=["GET", "POST"])
+def forgotpassword():
+    if request.method == "POST":
+        email = request.form['email']
+        oldpassword = request.form['oldpassword']
+        newpassword = request.form['newpassword']
+        newhashpassword = bcrypt.generate_password_hash(newpassword)
+
+        res = db.find({"email": email},{"_id":1,"password":1})
+        l = list(res)
+
+        if len(l) != 0 and bcrypt.check_password_hash(l[0]["password"],oldpassword):
+            if not re.fullmatch(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,10}$', newpassword):
+                flash(f"Password should contain 8-10 characters with atleast 1 uppercase letter, lowercase letter, digit, and a special character")
+            else:
+                db.update_one({"email":email}, {'$set' : {"password" : newhashpassword}})
+                flash(f"Password updated for {email} successfully!!")
+                return redirect("/login")
+        else:
+            flash(f"Email ID or Current Password incorrect")
+            return redirect("/forgotpassword")
+    return render_template("forgotpassword.html")
 
 
 @app.route("/logout")

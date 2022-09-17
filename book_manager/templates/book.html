@@ -99,6 +99,9 @@ body {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+.trow:hover{
+  background-color: rgb(153, 151, 148);
+}
 
   </style>
   </head>
@@ -132,20 +135,18 @@ body {
   <tr>
     <th>Name</th>
     <th>Author</th>
-    <th>Description</th>
+    <th>Genres</th>
     <th>Price</th>
-    <th>Read</th>
   </tr>
   {% block body %}
     {% for book in newbook %}
     {% set nevar = book["_id"] %}
     {% set nevar2 = book["userid"] %}
-    <tr data-href = "{{url_for('getbook', bookid = nevar)}}">
+    <tr data-href = "{{url_for('getbook', bookid = nevar)}}" class="trow">
         <td>{{book["name"]}}</td>
         <td>{{book["author"]}}</td>
-        <td>{{book["description"]}}</td>
+        <td>{{book["genres"]}}</td>
         <td>{{book["price"]}}</td>
-        <td>{{book["read"]}}</td>
     </tr>
     {% endfor %}
   {% endblock %}
