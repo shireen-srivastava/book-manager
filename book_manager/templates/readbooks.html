@@ -14,7 +14,7 @@
   table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
-    width: 100%;
+    width: 90%;
   }
   
   td, th {
@@ -32,12 +32,14 @@
   }
 
 h4 {
-  color : green
+  color : white
 }
 
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-image: url('static/images/back.jpg');
+  position: relative;
 }
 
 .navbar {
@@ -128,9 +130,11 @@ body {
   </head>
   <body>
      <div class="navbar">
-      <a href="http://127.0.0.1:5000/homepage">Home</a>
+      <a href="http://127.0.0.1:5000/books">Home</a>
       <a href="http://127.0.0.1:5000/addbook">Add Book</a>
       <a href="{{url_for('getreadbooks')}}">Read Book Collection</a>
+      <a href="{{url_for('subscribebooks')}}">Subscribe Books</a>
+      <a href = "{{url_for('recommend')}}">Recommendations</a>
       <div class="dropdown" style="float:right; padding-right: 40px;">
         <button class="dropbtn"> 
           <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size:25px"></i>
@@ -152,7 +156,7 @@ body {
 <br>
 <center><h1>Read Books Collection</h1></center>
 <br><br>
-<table>
+<center><table>
   <tr>
     <th>Name</th>
     <th>Author</th>
@@ -171,7 +175,7 @@ body {
     </tr>
     {% endfor %}
   {% endblock %}
-</table><br><br><br>
+</table><br><br><br></center>
 <center><a href = "http://127.0.0.1:5000/books" class = "button button2">BACK</a></center>
 
 <script>

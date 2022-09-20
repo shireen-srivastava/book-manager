@@ -32,12 +32,14 @@
   }
 
 h4 {
-  color : green
+  color : white
 }
 
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-image: url('static/images/back.jpg');
+  position: relative;
 }
 
 .navbar {
@@ -141,8 +143,11 @@ li a:hover:not(.active) {
 </head>
 <body>
    <div class="navbar">
-    <a href="http://127.0.0.1:5000/homepage">Home</a>
+    <a href="http://127.0.0.1:5000/books">Home</a>
     <a href="http://127.0.0.1:5000/addbook">Add Book</a>
+    <a href="{{url_for('getreadbooks')}}">Read Book Collection</a>
+    <a href="{{url_for('subscribebooks')}}">Subscribe Books</a>
+    <a href = "{{url_for('recommend')}}">Recommendations</a>
     <div class="dropdown" style="float:right; padding-right: 40px;">
       <button class="dropbtn"> 
         <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size:25px"></i>

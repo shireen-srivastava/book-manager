@@ -50,7 +50,7 @@
       }
     
     h4 {
-      color : green
+      color : white
     }
     
     
@@ -124,8 +124,11 @@
       </head>
       <body>
          <div class="navbar">
-          <a href="http://127.0.0.1:5000/homepage">Home</a>
+          <a href="http://127.0.0.1:5000/books">Home</a>
           <a href="http://127.0.0.1:5000/addbook">Add Book</a>
+          <a href="{{url_for('getreadbooks')}}">Read Book Collection</a>
+          <a href="{{url_for('subscribebooks')}}">Subscribe Books</a>
+          <a href = "{{url_for('recommend')}}">Recommendations</a>
           <div class="dropdown" style="float:right; padding-right: 40px;">
             <button class="dropbtn"> 
               <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size:25px"></i>
@@ -161,7 +164,8 @@
         <center>
             
             <a href = "{{ url_for('update_book', bookid = nevar)}}" class = "button button2">UPDATE</a>
-            <a href = "{{ url_for('delete_book', bookid = nevar)}}" class = "button button2">DELETE</a>
+            <a href = "{{ url_for('delete_book', bookid = nevar)}}" onclick="return confirm('Do you want to delete this')" class = "button button2">DELETE</a>
+            
             <a href = "http://127.0.0.1:5000/books" class = "button button2">BACK</a>
         </center>
        

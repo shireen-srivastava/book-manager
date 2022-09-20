@@ -10,11 +10,32 @@
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
   }
+
+  .button {
+  background-color: #534b3c; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  -webkit-transition-duration: 0.4s; 
+  transition-duration: 0.4s;
+  border-radius: 8px;
+}
+
+.button2:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
   
   table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 90%;
+    align-self: center;
   }
   
   td, th {
@@ -133,7 +154,7 @@ body {
   {% endif %}  
 {% endwith %}</h4>
 <br>
-<center><h1>My Books</h1></center>
+<center><h1>Subscribe To Read</h1></center>
 <br><br>
 <center><table>
   <tr>
@@ -141,33 +162,25 @@ body {
     <th>Author</th>
     <th>Genres</th>
     <th>Price</th>
-    <th>Unsubscribe Book</th>
+    <th>Subscribe Book</th>
   </tr>
   {% block body %}
     {% for book in newbook %}
     {% set nevar = book["_id"] %}
-    {% set nevar2 = book["userid"] %}
-    <tr data-href = "{{url_for('getbook', bookid = nevar)}}" class="trow">
+    <tr data-href class="trow">
         <td>{{book["name"]}}</td>
         <td>{{book["author"]}}</td>
         <td>{{book["genres"]}}</td>
         <td>{{book["price"]}}</td>
-        <td><a href = "{{url_for('unsubscribebutton', bookid = nevar)}}">Unsubscribe</a></td>
+        <td><a href = "{{url_for('subscribebutton', bookid = nevar)}}">Subscribe</a></td>
     </tr>
     {% endfor %}
   {% endblock %}
 </table></center>
+<br><br>
+<center>
+    <a href = "http://127.0.0.1:5000/books" class = "button button2">BACK</a>
+</center>
 
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-  const rows = document.querySelectorAll("tr[data-href]");
-  rows.forEach(row => {
-    row.addEventListener("click", () => {
-      window.location.href = row.dataset.href;
-    })
-  })
-})
-</script>
 </body>
 </html>

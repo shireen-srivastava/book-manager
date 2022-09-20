@@ -8,12 +8,6 @@ import re
 import os
 import pathlib
 import requests
-from flask import Flask, session, abort, redirect, request
-# from google.oauth2 import id_token
-# from google_auth_oauthlib.flow import Flow
-# from pip._vendor import cachecontrol
-# import google.auth.transport.requests
-
 
 app = Flask(__name__)
 
@@ -22,39 +16,22 @@ app.config['SECRET_KEY'] = '234567iujhgvfcdsertyui98765427uywh'
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
-
-
 bcrypt = Bcrypt(app)
 sessionv = Session(app)
 mongo = PyMongo(app)
 
-
-
-
-# os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  #this is to set our environment to https because OAuth 2.0 only supports https environments
-
-# GOOGLE_CLIENT_ID = "639636231734-ak3qf1vi88tk0erbs5fukimvhfkssm5s.apps.googleusercontent.com"  #enter your client id you got from Google console
-# client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret_639636231734-ak3qf1vi88tk0erbs5fukimvhfkssm5s.apps.googleusercontent.com.json")  #set the path to where the .json file you got Google console is
-
-# print(os.path)
-# print(pathlib.Path)
-# flow = Flow.from_client_secrets_file(  #Flow is OAuth 2.0 a class that stores all the information on how we want to authorize our users
-#     client_secrets_file=client_secrets_file,
-#     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],  #here we are specifing what do we get after the authorization
-#     redirect_uri="http://127.0.0.1:5000/callback"  #and the redirect URI is the point where the user will end up after the authorization
-# )
-
-
-
-
 db = mongo.db.users
 db1 = mongo.db.books
 
+
+# Returns index page which shows login/signup.
 @app.route("/homepage", methods = ["GET"])
 def homepage():
     return render_template("index.html")
 
 
+# User's Registration route.
+# Takes input name, email, password.
 @app.route("/registration", methods = ["GET","POST"])
 def createUsers():
     if request.method == "POST":
@@ -62,6 +39,8 @@ def createUsers():
         new_name = request.form['name']
         new_email = request.form['email']
         password = request.form['password']
+
+        # Password Encryption
         hash_password = bcrypt.generate_password_hash(password)
         
         if not re.fullmatch(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', new_email):
@@ -84,6 +63,9 @@ def createUsers():
     return render_template("register.html")
     
 
+# User's Login route.
+# Takes input email, password.
+# Returns user dashboard.
 @app.route("/login", methods = ["GET", "POST"])
 def getuser():
     global userid
@@ -91,11 +73,17 @@ def getuser():
         new_email = request.form['email']
         password = request.form['password']
 
+        # Finds password through email entered by user.
         res = db.find({"email": new_email},{"_id":1,"password":1})
         l = list(res)
-
+        
+        # If email exists, checks if hashed password matches with the password entered by user.
         if len(l) != 0 and bcrypt.check_password_hash(l[0]["password"],password):
+
+            # Creating session for logged in user.
             session["email"] = new_email
+
+            # Storing _id of logged in user.
             userid = l[0]["_id"]
             flash(f"You are successfully logged in!",'success') 
             return redirect("/books")
@@ -105,6 +93,40 @@ def getuser():
     return render_template("login.html")
 
 
+# User can reset their password.
+# Takes input email, current password and new password.
+@app.route("/forgotpassword", methods=["GET", "POST"])
+def forgotpassword():
+    if request.method == "POST":
+        email = request.form['email']
+        oldpassword = request.form['oldpassword']
+        newpassword = request.form['newpassword']
+
+        # Encrypted new password.
+        newhashpassword = bcrypt.generate_password_hash(newpassword)
+
+        # Finds current password through email entered by user.
+        res = db.find({"email": email},{"_id":1,"password":1})
+        l = list(res)
+
+        # Checks if current password matches.
+        if len(l) != 0 and bcrypt.check_password_hash(l[0]["password"],oldpassword):
+            if not re.fullmatch(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,10}$', newpassword):
+                flash(f"Password should contain 8-10 characters with atleast 1 uppercase letter, lowercase letter, digit, and a special character")
+            else:
+
+                # Update new encrypted password.
+                db.update_one({"email":email}, {'$set' : {"password" : newhashpassword}})
+                flash(f"Password updated for {email} successfully!!")
+                return redirect("/login")
+        else:
+            flash(f"Email ID or Current Password incorrect")
+            return redirect("/forgotpassword")
+    return render_template("forgotpassword.html")
+
+
+# To fetch all the books for logged in user.
+# Takes @parameter userid of logged in user.
 @app.route("/books", methods = ["GET"])
 def getbooks():
     if session["email"]:
@@ -117,6 +139,21 @@ def getbooks():
         return redirect("/login")
 
 
+# To fetch particular book with details.
+# Takes @parameter _id of particular book.
+@app.route("/books/<bookid>", methods = ["GET"])
+def getbook(bookid):
+    if session["email"]:
+        new_book = []
+        for i in db1.find({"_id" : ObjectId(bookid)}):
+            new_book.append(i)
+        return render_template("bookdetails.html", newbook = new_book)
+    else:
+        return redirect("/login")
+
+
+# To fetch all the books read by particular user. 
+# Checks when read = true.
 @app.route("/readbooks", methods = ["GET"])
 def getreadbooks():
     if session["email"]:
@@ -130,14 +167,8 @@ def getreadbooks():
         return redirect("/login")
 
 
-@app.route("/users", methods = ["GET"])
-def getprofile():
-    user = []
-    for i in db.find({"email" : session["email"]}):
-        user.append(i)
-    return render_template("userdetails.html", user = user)
-
-
+# To create a book for user.
+# Returns name, author, genres, price of book.
 @app.route("/addbook", methods = ["GET", "POST"])
 def createBooks():
     if session["email"]:
@@ -162,17 +193,7 @@ def createBooks():
         return redirect("/login")
 
 
-@app.route("/books/<bookid>", methods = ["GET"])
-def getbook(bookid):
-    if session["email"]:
-        new_book = []
-        for i in db1.find({"_id" : ObjectId(bookid)}):
-            new_book.append(i)
-        return render_template("bookdetails.html", newbook = new_book)
-    else:
-        return redirect("/login")
-
-
+# To delete the book from database.
 @app.route('/deletebooks/<bookid>', methods=["GET", "POST"])
 def delete_book(bookid):
     if session["email"]:
@@ -183,6 +204,9 @@ def delete_book(bookid):
         return redirect("/login")
 
 
+# GET : To fetch the current book details.
+# POST : To update the book details. 
+# Takes @parameters name, author, genres, price, read of book.
 @app.route('/updatebooks/<bookid>', methods=["GET", "POST"])
 def update_book(bookid):
     if session["email"]:
@@ -209,30 +233,76 @@ def update_book(bookid):
         return redirect("/login")
 
 
-@app.route("/forgotpassword", methods=["GET", "POST"])
-def forgotpassword():
-    if request.method == "POST":
-        email = request.form['email']
-        oldpassword = request.form['oldpassword']
-        newpassword = request.form['newpassword']
-        newhashpassword = bcrypt.generate_password_hash(newpassword)
-
-        res = db.find({"email": email},{"_id":1,"password":1})
-        l = list(res)
-
-        if len(l) != 0 and bcrypt.check_password_hash(l[0]["password"],oldpassword):
-            if not re.fullmatch(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,10}$', newpassword):
-                flash(f"Password should contain 8-10 characters with atleast 1 uppercase letter, lowercase letter, digit, and a special character")
-            else:
-                db.update_one({"email":email}, {'$set' : {"password" : newhashpassword}})
-                flash(f"Password updated for {email} successfully!!")
-                return redirect("/login")
-        else:
-            flash(f"Email ID or Current Password incorrect")
-            return redirect("/forgotpassword")
-    return render_template("forgotpassword.html")
+# To fetch all the unsubscribed books.
+# Check when userid is null.
+@app.route("/subscribebooks", methods = ["GET","POST"])
+def subscribebooks():
+    if session["email"]:
+        new_book = []
+        data = db1.find({"userid": ""})
+        for i in data:
+            new_book.append(i)
+        return render_template("subscribe.html", newbook = new_book)
+    else:
+        return redirect("/login")
 
 
+# To subscribe a particular book.
+# Updates userid of particular book with the logged in userid.
+@app.route("/subscribebutton/<bookid>", methods = ["GET","POST"])
+def subscribebutton(bookid):
+    if session["email"]:
+        db1.update_one({"_id":ObjectId(bookid)}, {'$set' : {"userid":userid}})
+        flash("You have successfully subscribed the book!!")
+        return redirect("/subscribebooks")
+    else:
+        return redirect("/login")
+
+
+# To unsubscribe a particular book.
+# Updates userid of subscribed book with null.
+# Also update, read = False when unsubscribing a book.
+@app.route("/unsubscribebutton/<bookid>", methods = ["GET","POST"])
+def unsubscribebutton(bookid):
+    if session["email"]:
+        db1.update_one({"_id":ObjectId(bookid)}, {'$set' : {"userid":"", "read" : False}})
+        flash("You have successfully unsubscribed the book!!")
+        return redirect("/subscribebooks")
+    else:
+        return redirect("/login")
+
+
+# To recommend books according to genres, user subscribed.
+# Returns 3 books of each genres.
+@app.route("/recommend", methods = ["GET","POST"])
+def recommend():
+    if session["email"]:
+        kl=[]
+        # To find all the genres user subscribed.
+        data = db1.find({"userid":userid},{"genres":1,"_id":0})
+        usergenres = list(data)
+
+        # To remove duplicate genres.
+        setgenres = set(d.get('genres', 'alt') for d in usergenres)
+    
+        # To find the book which are unsubscribed, of same genres user subscribed.
+        for i in setgenres:
+            kl.append(list(db1.find({"userid": "", "genres" : i}).limit(3)))
+        return render_template("recommend.html", kl = kl)
+    else:
+        return redirect("/login")
+
+
+# To fetch user details with session.
+@app.route("/users", methods = ["GET"])
+def getprofile():
+    user = []
+    for i in db.find({"email" : session["email"]}):
+        user.append(i)
+    return render_template("userdetails.html", user = user)
+
+
+# Logout from session.
 @app.route("/logout")
 def logout():
     session["email"] = None
