@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from flask_session import Session
+from flask_paginate import Pagination, get_page_parameter
 import re
 import os
 import pathlib
@@ -235,14 +236,34 @@ def update_book(bookid):
 
 # To fetch all the unsubscribed books.
 # Check when userid is null.
+genres=""
+bookname=""
 @app.route("/subscribebooks", methods = ["GET","POST"])
 def subscribebooks():
+    global genres
+    global bookname
     if session["email"]:
+        PER_PAGE = 8
         new_book = []
-        data = db1.find({"userid": ""})
-        for i in data:
-            new_book.append(i)
-        return render_template("subscribe.html", newbook = new_book)
+        if genres:
+            data = db1.find({"userid": "",'genres':genres})
+            genres=None
+
+        elif bookname:
+            data = db1.find({"userid": "", 'name':bookname})
+            bookname=None
+
+        else:
+            data = db1.find({"userid": ""})
+         
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        for j in data:
+            new_book.append(j)
+        i=(page-1)*PER_PAGE
+        bbooks = new_book[i:i+8]
+        pagination = Pagination(page=page, total=len(new_book),per_page=PER_PAGE, record_name='books', css_framework='bootstrap4')
+
+        return render_template("subscribe.html",new_book=bbooks,pagination=pagination)
     else:
         return redirect("/login")
 
@@ -300,6 +321,22 @@ def getprofile():
     for i in db.find({"email" : session["email"]}):
         user.append(i)
     return render_template("userdetails.html", user = user)
+
+
+# Filtering books based on genre
+@app.route("/filterSubscribeBooks/<genre>", methods = ["GET"])
+def getGenres(genre):
+    global genres
+    genres=genre
+    return redirect("/subscribebooks")
+
+
+@app.route("/searchbar", methods = ["GET", "POST"])
+def searchbar():
+    global bookname
+    if request.method == "POST":
+        bookname = request.form["bookname"]
+    return redirect("/subscribebooks")
 
 
 # Logout from session.
